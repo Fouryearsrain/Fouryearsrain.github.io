@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  
+  <link rel="stylesheet" href="/lib/animate-css/animate.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/pace-js@1/themes/blue/pace-theme-center-atom.min.css">
+  <script src="//cdn.jsdelivr.net/npm/pace-js@1/pace.min.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fouryearsrain.github.io","root":"/","scheme":"Pisces","version":"8.0.0-rc.4","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+
+  <meta name="description" content="Linux-信号（信号初步以及捕捉-超详解）1.信号的概念：信号的特点：                    1简单。2 不能携带大量数据。3满足某种特殊条件才发送。信号的特质：                    信号是通过软件方法实现的，其实现手段导致信号有很强的延时性，但对于用户来说，这个延时很短并不会被察觉。            注：每个进程的所有信号，都是由内核发送内核处理。 能够">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux_day4">
+<meta property="og:url" content="https://fouryearsrain.github.io/2020/08/01/Linux-day4/index.html">
+<meta property="og:site_name" content="MyBlog">
+<meta property="og:description" content="Linux-信号（信号初步以及捕捉-超详解）1.信号的概念：信号的特点：                    1简单。2 不能携带大量数据。3满足某种特殊条件才发送。信号的特质：                    信号是通过软件方法实现的，其实现手段导致信号有很强的延时性，但对于用户来说，这个延时很短并不会被察觉。            注：每个进程的所有信号，都是由内核发送内核处理。 能够">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020051021491628.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200511191714862.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200511192731681.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200511211932961.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200511200535807.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200512220849622.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020051222301072.PNG#pic_center">
+<meta property="article:published_time" content="2020-08-01T08:35:19.000Z">
+<meta property="article:modified_time" content="2020-08-01T08:39:46.168Z">
+<meta property="article:author" content="Fouryearsrain">
+<meta property="article:tag" content="导航 - 分享">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2020051021491628.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center">
+
+<link rel="canonical" href="https://fouryearsrain.github.io/2020/08/01/Linux-day4/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux_day4 | MyBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+<a target="_blank" rel="noopener" href="https://github.com/Fouryearsrain" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">MyBlog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-%E4%BF%A1%E5%8F%B7%EF%BC%88%E4%BF%A1%E5%8F%B7%E5%88%9D%E6%AD%A5%E4%BB%A5%E5%8F%8A%E6%8D%95%E6%8D%89-%E8%B6%85%E8%AF%A6%E8%A7%A3%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">Linux-信号（信号初步以及捕捉-超详解）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E4%BF%A1%E5%8F%B7%E7%9A%84%E6%A6%82%E5%BF%B5%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">1.信号的概念：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%BD%E5%A4%9F%E4%BA%A7%E7%94%9F%E4%BF%A1%E5%8F%B7%E7%9A%84%E4%BA%8B%E4%BB%B6%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">能够产生信号的事件：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%93%E4%B8%9A%E6%9C%AF%E8%AF%AD%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">专业术语：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">信号的处理方式：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%9B%9B%E8%A6%81%E7%B4%A0"><span class="nav-number">2.4.</span> <span class="nav-text">信号的四要素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A7%E7%94%9F%E4%BF%A1%E5%8F%B7%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">产生信号：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kill%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">2.5.1.</span> <span class="nav-text">kill函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E6%9D%A1%E4%BB%B6%E4%BA%A7%E7%94%9F%E4%BF%A1%E5%8F%B7%EF%BC%9A"><span class="nav-number">2.5.2.</span> <span class="nav-text">软件条件产生信号：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setitimer%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">2.5.3.</span> <span class="nav-text">setitimer函数：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%A4%84%E7%90%86%EF%BC%9A"><span class="nav-number">2.6.</span> <span class="nav-text">信号集处理：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E6%8D%95%E6%8D%89%E5%87%BD%E6%95%B0%E7%9A%84%E6%B3%A8%E5%86%8C%EF%BC%9A"><span class="nav-number">2.7.</span> <span class="nav-text">信号捕捉函数的注册：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E4%B8%80%E8%A7%88%E8%A1%A8"><span class="nav-number">2.7.1.</span> <span class="nav-text">信号一览表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%84%E5%BD%95%EF%BC%9A"><span class="nav-number">2.7.1.1.</span> <span class="nav-text">附录：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%91%8A%E8%AF%AB%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">告诫：</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Fouryearsrain"
+      src="/images/timg.jpg">
+  <p class="site-author-name" itemprop="name">Fouryearsrain</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Fouryearsrain" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Fouryearsrain" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_45322740" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_45322740" rel="noopener" target="_blank">CSDN</a>
+        </li>
+    </ul>
+  </div>
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://fouryearsrain.github.io/2020/08/01/Linux-day4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/timg.jpg">
+      <meta itemprop="name" content="Fouryearsrain">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MyBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux_day4
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-01 16:35:19 / 修改时间：16:39:46" itemprop="dateCreated datePublished" datetime="2020-08-01T16:35:19+08:00">2020-08-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Linux-信号（信号初步以及捕捉-超详解）"><a href="#Linux-信号（信号初步以及捕捉-超详解）" class="headerlink" title="Linux-信号（信号初步以及捕捉-超详解）"></a>Linux-信号（信号初步以及捕捉-超详解）</h1><h1 id="1-信号的概念："><a href="#1-信号的概念：" class="headerlink" title="1.信号的概念："></a>1.信号的概念：</h1><p>信号的特点：<br>                    1简单。2 不能携带大量数据。3满足某种特殊条件才发送。<br>信号的特质：<br>                    信号是通过软件方法实现的，其实现手段导致信号有很强的延时性，但对于用户来说，这个延时很短并不会被察觉。<br>            <strong>注：每个进程的所有信号，都是由内核发送内核处理。</strong></p>
+<h2 id="能够产生信号的事件："><a href="#能够产生信号的事件：" class="headerlink" title="能够产生信号的事件："></a>能够产生信号的事件：</h2><pre><code>            一.按键产生。比如我们经常使用的 ctrl+c都是产生一个信号
+            二.系统调用产生。比如 kill （函数）
+            三.软件条件产生。比如定时器 alarm
+            四.硬件产生的异常。比如非法访问内存（段错误）
+            五.命令产生 ，比如：kill命令</code></pre>
+<h2 id="专业术语："><a href="#专业术语：" class="headerlink" title="专业术语："></a>专业术语：</h2><p><strong>递达</strong>：信号产生并且到达；（就是说信号产生并且被成功接收  ）<br><strong>未决</strong>：产生和递达之间的状态，主要用于阻塞（屏蔽）导致该状态<br><strong>未决信号集</strong>:就像他的名字一样，这是一个集合，无许且不重复。它存在于进程的pcb中，一个进程的未决信号集是一个类似清空的数组（也就是这个数组全为零）。而且这个数组只有8个字节也就是64位（由于信号的种类只有64种，每种信号对应一个0），当产生信号的时候，pcb会将该信号对应下标的0变为1，说明该信号产生需要被处理。然后如果<strong>该信号未被阻塞的情况下</strong>，内核会立即对信号作出处理，然后再将信号对应的1变为0。<br>就像前面说的这是该信号没有被阻塞的情况下，那么阻塞的情况下呢？这时候我们就需要引出另外的一个专业术语—–&gt;<strong>信号阻塞集</strong>（也叫<strong>信号屏蔽字</strong>）<br><strong>信号阻塞集</strong>：他跟信号未决信号集一样也是一个集合而且也是类似一个64位的数组，存放于pcb中，最开始全为零也就是不对任何信号屏蔽。对于它的作用就是阻值某些信号在未决信号集中从1变成0的过程。而判断阻止哪一种信号的依据就是对应信号阻塞集的0变为1.<br>  总的来说就是，<strong>信号阻塞集影响未决信号集。</strong></p>
+<h2 id="信号的处理方式："><a href="#信号的处理方式：" class="headerlink" title="信号的处理方式："></a>信号的处理方式：</h2><pre><code>                        1.默认处理动作（由内核设定好的）。
+                         2.忽略（丢弃）注意：这是处理的方式为忽略 而不是不处理（注意理解问题）。
+                         3.捕捉（调用信号的处理方式）。
+                         注意一般信号都有三种处理方式可以根据目的做出改变。但是唯独9号信号（SIGKILL）和19号信号（SIGSTOP）只能执行默认处理动作,甚至不能将其设置为阻塞。（毕竟这两个是用来关闭进程的，如果这两个信号都被修改，比如修改为忽略处理，那么内核不就失去管理进程的能力了，也挺容易理解的）</code></pre>
+<h2 id="信号的四要素"><a href="#信号的四要素" class="headerlink" title="信号的四要素"></a>信号的四要素</h2><p><strong><em>1.信号的编号<br>2.信号的名称<br>3.事件<br>4.默认处理动作</em></strong><br>前三个要素都好理解，这里介绍一下Linux包含的默认处理动作：<br>Term: 终止进程<br>Ign：忽略信号（这里指的是对信号的处理方式为忽略）<br>Core:终止进程，生成一个Core文件。（主要用于gdb调试）<br>Stop:停止进程<br>Cont:让停止进程继续执行。<br><strong>注意 上面五种处理方式相当于处理方式1（默认处理）的子集而不是与处理方式并列。</strong></p>
+<h2 id="产生信号："><a href="#产生信号：" class="headerlink" title="产生信号："></a>产生信号：</h2><h3 id="kill函数："><a href="#kill函数：" class="headerlink" title="kill函数："></a>kill函数：</h3><p><img src="https://img-blog.csdnimg.cn/2020051021491628.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>第一个参数为对应收信号的进程的进程号，第二个参数为信号的编号<br>（注意一下，第二个参数最好使用宏名而不是使用编号，这有利于跨平台并且可读性增强）<br>第一个参数：<br>当pid&gt;0时，表示将信号发送给pid对应进程号的进程<br>    pid=0时，表示将信号发送给和调用kill函数的进程属于同一进程组（下面有解释）的所有进程。<br>    pid&lt;0时，表示将信号发送给-pid对应的进程组。<br>    pid=-1时，表示发送给进程有权限发送的所有系统中所有的进程<br>（进程组：每个进程都属于一个进程组，进程组是一个或者多个进程集合，他们互相关联，共同实现一个实体任务，每个进程组都有一个组长，默认的组ID和进程组长相同）<br><strong>raise函数</strong>：只有一个参数就是信号的编号，因为他的功能就是给自己发信号，所以不需要传入特定的进程号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">raise(sig)&#x3D;kill(getpid(),sig);</span><br></pre></td></tr></table></figure>
+<p><strong>abort函数</strong>：给自己发送异常终止信号,也就是六号信号SIGABRT,并产生Core文件。没有参数没有返回值。</p>
+<h3 id="软件条件产生信号："><a href="#软件条件产生信号：" class="headerlink" title="软件条件产生信号："></a>软件条件产生信号：</h3><p>alarm函数<br>            设置定时器，在指定时间(second)后,内核将给当前进程发送一个 14）SIGALRM信号，进程接收到这信号，默认动作终止。<br>            （注意：每个进程只有一个唯一的定时器）<br>            函数返回值：返回0或者上一次定闹钟还差的时间（就比如你先alarm(5),然后再两秒之后你瞬间int ret =alarm(3);ret=3,就是你定时的时间减去已经执行的两秒）<br>            由于alarm的参数设定的闹钟时间，所以经常使用alarm(0)来结束闹钟。</p>
+<h3 id="setitimer函数："><a href="#setitimer函数：" class="headerlink" title="setitimer函数："></a>setitimer函数：</h3><p>先看man文档：<br><img src="https://img-blog.csdnimg.cn/20200511191714862.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>    首先setitimer其实就是对alarm的增强版，也是用到进程中惟一的定时器。<br>        首先第一个参数：<br>        是三个宏用来指定运行方式<br>        ① 自然定时：ITIMER_REAL → 14）SIGLARM                         计算自然时间<br>        ② 虚拟空间计时(用户空间)：ITIMER_VIRTUAL → 26）SIGVTALRM       只计算进程占用cpu的时间<br>        ③ 运行时计时(用户+内核)：ITIMER_PROF → 27）SIGPROF         计算占用cpu及执行系统调用的时间<br>        （重点掌握第一种即可）<br>        第二个参数是一个结构体，根据const修饰以及是个指针就很容易猜到这是一个传入参数，是微秒级的<br>        <img src="https://img-blog.csdnimg.cn/20200511192731681.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>这个结构体的两个参数还是结构体，这两个结构体分别表示下一次等待的时间和这一次等待的时间。如果仅用来实现类似alarm的功能就可以直接将第一个参数赋值为零<br>至于对应的结构体，也就是下面列出来的类型，struct timeval,第一个参数表示秒级第二个参数表示微秒级<br>        第三个参数就是alarm的返回值，是一个传出参数。不过对应的灵敏度也比alarm更灵活<br>    以下是一个用setitimer实现alarm的代码（可以参考使用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">1 #include&lt;stdio.h&gt;</span><br><span class="line">  2 #include&lt;iostream&gt;</span><br><span class="line">  3 #include&lt;unistd.h&gt;</span><br><span class="line">  4 #include&lt;sys&#x2F;time.h&gt;</span><br><span class="line">  5 using namespace std;</span><br><span class="line">  6 itimerval it,oldit;</span><br><span class="line">  7 int my_alarm(int num)&#123;</span><br><span class="line">  8         it.it_value.tv_sec&#x3D;num;</span><br><span class="line">  9         it.it_value.tv_usec&#x3D;0;</span><br><span class="line"> 10         it.it_interval.tv_sec&#x3D;0;</span><br><span class="line"> 11         it.it_interval.tv_usec&#x3D;0;</span><br><span class="line"> 12         setitimer(ITIMER_REAL,&amp;it,&amp;oldit);</span><br><span class="line"> 13         return oldit.it_value.tv_sec;</span><br><span class="line"> 14 &#125;</span><br><span class="line"> 15 int main()&#123;</span><br><span class="line"> 16 </span><br><span class="line"> 17         int temp,i&#x3D;0;</span><br><span class="line"> 18         scanf(&quot;%d&quot;,&amp;temp);</span><br><span class="line"> 19         printf(&quot;start\n&quot;);</span><br><span class="line"> 20         int ans&#x3D;my_alarm(temp);</span><br><span class="line"> 21         while(1)&#123;</span><br><span class="line"> 22         printf(&quot;%d\n&quot;,i++);</span><br><span class="line"> 23         &#125;</span><br><span class="line"> 24 </span><br><span class="line"> 25 </span><br><span class="line"> 26         return 0;</span><br><span class="line"> 27 &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="信号集处理："><a href="#信号集处理：" class="headerlink" title="信号集处理："></a>信号集处理：</h2><p>如何设置一个信号集</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sigset_t set;&#x2F;&#x2F;定义集合</span><br><span class="line">int sigemptyset(sigsset_t *set)&#x2F;&#x2F;将某个信号集清零</span><br><span class="line">int sigfillset(sigset_t *set)&#x2F;&#x2F;将某个信号集置为1</span><br><span class="line">int sigaddset(sigset_t *set, int signum);&#x2F;&#x2F;将某个信号集加入信号集</span><br><span class="line">int sigdelset(sigset_t *set, int signum);&#x2F;&#x2F;将某个信号从信号集删除</span><br><span class="line">&#x2F;&#x2F;以上函数都是 成功返回0 失败返回 -1</span><br><span class="line">int sigismember(const sigset_t *set,int signum)&#x2F;&#x2F;判断是否在信号集合中，在集合返回1，不在返回0，失败返回-1</span><br></pre></td></tr></table></figure>
+<p>首先我们的为什么要设定信号集？<br>是因为我们想对上面讲过的信号屏蔽字进行操作（信号屏蔽字的功能就是影响未决信号集）。来达成我们相应的目的。<br>那很明显，我们下一步的目的就是如何将信号屏蔽字设置为我们的信号集合。<br>这时候就需要用到另一个函数：sigprocmask函数<br>     int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);<br>这时候我们应该清楚，我们的信号集合其实就是一种位图，我们对其进行的操作类似于与或运算，对原有的信号屏蔽字进行操作。但如果我们再深入考虑一步的话其实也就是，对信号进行阻塞和撤销阻塞两种操作。对，参数一的功能就是实现这一目的（不过这里提供了第三种就是将原来的信号屏蔽字直接替换为当前传入的信号集合，简单粗暴，爱了爱了~~）。<br>    how参数取值：    假设当前的信号屏蔽字为mask<br>1.SIG_BLOCK: 当how设置为此值，set表示需要屏蔽的信号。相当于 mask = mask|set<br>2.SIG_UNBLOCK: 当how设置为此，set表示需要解除屏蔽的信号。相当于 mask = mask &amp; ~set<br>3.SIG_SETMASK: 当how设置为此，set表示用于替代原始屏蔽及的新屏蔽集。相当于 mask = set若，调用sigprocmask解除了对当前若干个信号的阻塞，则在sigprocmask返回前，至少将其中一个信号递达。<br>第二个参数就是一个传入参数，将我们设定的信号集合传入。<br>第三个参数是一个传出参数，就是将原来的信号屏蔽字导出（如果单纯只想查看一下当前的信号屏蔽字可以利用sigpending(sigset_t *set);，set就是一个传出参数，将原来的信号屏蔽字导出。）<br>这里给出一个打印信号屏蔽子的代码可以参考一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">  1#include&lt;iostream&gt;</span><br><span class="line">  2 #include&lt;stdio.h&gt;</span><br><span class="line">  3 #include&lt;stdlib.h&gt;</span><br><span class="line">  4 #include&lt;signal.h&gt;</span><br><span class="line">  5 #include&lt;unistd.h&gt;</span><br><span class="line">  6 using namespace std;</span><br><span class="line">  7 void sig_show(sigset_t* pset)</span><br><span class="line">  8 &#123;</span><br><span class="line">  9         for(int i&#x3D;0;i&lt;32;i++)</span><br><span class="line"> 10         &#123;</span><br><span class="line"> 11                 if(sigismember(pset,i)&#x3D;&#x3D;1)</span><br><span class="line"> 12                 &#123;</span><br><span class="line"> 13                         printf(&quot;1&quot;);</span><br><span class="line"> 14                 &#125;</span><br><span class="line"> 15                 else&#123;</span><br><span class="line"> 16                         cout&lt;&lt;&quot;0&quot;;</span><br><span class="line"> 17                 &#125;</span><br><span class="line"> 18         &#125;</span><br><span class="line"> 19 </span><br><span class="line"> 20                 cout&lt;&lt;endl;</span><br><span class="line"> 21 &#125;</span><br><span class="line"> 22 int main()</span><br><span class="line"> 23 &#123;</span><br><span class="line"> 24 </span><br><span class="line"> 25         sigset_t set,oldset;</span><br><span class="line"> 26 </span><br><span class="line"> 27         sigemptyset(&amp;set);</span><br><span class="line"> 28         sigemptyset(&amp;oldset);</span><br><span class="line">sigaddset(&amp;set,SIGQUIT);&#x2F;&#x2F;将三号信号屏蔽，可以用ctrl+&#x2F;触发</span><br><span class="line"> 31 </span><br><span class="line"> 32         sigprocmask(SIG_BLOCK,&amp;set,&amp;oldset);</span><br><span class="line"> 33 </span><br><span class="line"> 34         while(1)</span><br><span class="line"> 35         &#123;</span><br><span class="line"> 36                 sigpending(&amp;set);</span><br><span class="line"> 37                 sig_show(&amp;set);</span><br><span class="line"> 38                 sleep(1);</span><br><span class="line"> 39         &#125;</span><br><span class="line"> 40 </span><br><span class="line"> 41         return 0;</span><br><span class="line"> 42 &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20200511211932961.png#pic_center" alt="在这里插入图片描述"><br>可见当我用ctrl+\产生信号后，信号屏蔽字就发生改变。</p>
+<h2 id="信号捕捉函数的注册："><a href="#信号捕捉函数的注册：" class="headerlink" title="信号捕捉函数的注册："></a>信号捕捉函数的注册：</h2><p>signal函数<br>                        <img src="https://img-blog.csdnimg.cn/20200511200535807.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>这个函数有两个参数，第一个参数为信号的类型，第二个参数为自己写的处理函数（非常容易使用，所以不再赘述）。</p>
+<p>sigaction函数 首先看一下man<br><img src="https://img-blog.csdnimg.cn/20200512220849622.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>首先 第一个参数是一个信号的编号，也就是我们想要捕捉的信号，<br>    第二个参数，我们从const 修饰词以及 指针，就很容易判别这是一传入参数。<br>    至于第三个参数，也很容易看出这是一个传出参数用来保留原来的处理方式。<br>        我们了解完功能之后，来深剖一下结构体的各个参数：<br>         struct sigaction {<br>        void     (*sa_handler)(int);<br>        void     (<em>sa_sigaction)(int, siginfo_t <em>, void *);<br>        sigset_t   sa_mask;<br>        int       sa_flags;<br>        void     (*sa_restorer)(void);<br>    };<br>    （值得注意的是，这个结构体的名字和函数的名字一样，所以你需要定义类型的时候加上struct，用来区别，否则会报错）<br>    第一个 sa_handler 很熟悉吧，没错这是一个以int类型为参数的函数指针，也就是我们的注册捕捉函数。当你想把该信号的处理方式设为忽略处理，你可以直接将SIG_IGN直接挂上去表示执行忽略，或者SIG_DEF表示执行默认动作。（</em></em>重点<strong>）<br>    第二个参数 当sa_flags被指定为SA_SIGINFO标志时，使用该信号处理程序。(很少使用)<br>    第三个参数： 调用信号处理函数时，所要屏蔽的信号集合(信号屏蔽字)。<br>    （注意这里这个时表示暂时屏蔽。举个例子：就是假如你的处理函数很慢需要执行很长时间，那么在处理的过程中，你不希望被其他的信号打扰，你就可以将不想打扰的信号设置为1，然后函数在执行的时候就可以把这些信号屏蔽，当函数结束的时候才可以处理这些信号）（</strong>重点<strong>）（如果不理解可以看一下，下面的参考代码）<br>    第四个参数：通常直接设置为零，表示默认属性。（当你执行注册函数的时候假如你捕捉的信号再次到来也不会处理）（</strong>重点**）<br>    第五个参数：该元素是过时的，不应该使用，POSIX.1标准将不指定该元素。(弃用)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">  1 #include&lt;iostream&gt;</span><br><span class="line">  2 #include&lt;stdio.h&gt;</span><br><span class="line">  3 #include&lt;unistd.h&gt;</span><br><span class="line">  4 #include&lt;signal.h&gt;</span><br><span class="line">  5 using namespace std;</span><br><span class="line">  6 void sol(int sig)</span><br><span class="line">  7 &#123;</span><br><span class="line">  8 printf(&quot;catch\n&quot;);</span><br><span class="line">  9 sleep(5);&#x2F;&#x2F;睡五秒来体现sa_mask的作用</span><br><span class="line"> 10 &#125;</span><br><span class="line"> 11 int main()</span><br><span class="line"> 12 &#123; struct sigaction sig,oldsig;</span><br><span class="line"> 13         sigset_t temp;</span><br><span class="line"> 14 </span><br><span class="line"> 15 </span><br><span class="line"> 16         sigaddset(&amp;temp,SIGINT);&#x2F;&#x2F;在执行的时候将SIGINT屏蔽掉</span><br><span class="line"> 17         sig.sa_mask&#x3D;temp;</span><br><span class="line"> 18         sig.sa_handler&#x3D;sol;</span><br><span class="line"> 19         sig.sa_flags&#x3D;0;</span><br><span class="line"> 20         sigaction(SIGQUIT,&amp;sig,&amp;oldsig);</span><br><span class="line"> 21         while(1);</span><br><span class="line"> 22 return 0;</span><br><span class="line"> 23 &#125;</span><br><span class="line">~          </span><br></pre></td></tr></table></figure>
+<p>执行结果：<br><img src="https://img-blog.csdnimg.cn/2020051222301072.PNG#pic_center" alt="在这里插入图片描述"><br>这里解释一下为何这样测试以及为啥会有这样的结果：<br>首先：我们的捕捉函数是捕捉了SIGQUIT信号可以由 Ctrl+\触发，并且注册的函数为捕捉到就打印catch，sa_mask是屏蔽了可以由Ctrl+c触发的SIGINT信号。<br>1.我输入Ctrl+,产生了SIGQUIT信号打印了catch这个字符串。<br>2.我再次输入Ctrl+,再次产生了SIGQUIT信号，但是由于我们采用默认属性所以，Ctrl+\会被屏蔽，不会再执行注册函数。所以没有反应。<br>3.我又输入Ctrl+c由于，注册函数仍然在执行，而且SIGINT被放在sa_mask里面，所以程序不会对SIGINT做出反应。<br>4.我第二次输入Ctrl+c时，注册函数已经结束，所以程序响应信号。程序结束。（如果还没理解请在评论区留言）</p>
+<p>这里总结一下信号捕捉的特性：<br>1.进程正常运行时，默认PCB中有一个信号屏蔽字，假定为☆，它决定了进程自动屏蔽哪些信号。当注册了某个信号捕捉函数，捕捉到该信号以后，要调用该函数。而该函数有可能执行很长时间，在这期间所屏蔽的信号不由☆来指定。而是用sa_mask来指定。调用完信号处理函数，再恢复为☆。<br>2.XXX信号捕捉函数执行期间，XXX信号自动被屏蔽。<br>3.阻塞的常规信号不支持排队，产生多次只记录一次。（后32个实时信号支持排队）</p>
+<h3 id="信号一览表"><a href="#信号一览表" class="headerlink" title="信号一览表"></a>信号一览表</h3><pre><code>1) SIGHUP: 当用户退出shell时，由该shell启动的所有进程将收到这个信号，默认动作为终止进程</code></pre>
+<ol start="2">
+<li>SIGINT：当用户按下了&lt;Ctrl+C&gt;组合键时，用户终端向正在运行中的由该终端启动的程序发出此信号。默认动<br>作为终止进程。</li>
+<li>SIGQUIT：当用户按下&lt;ctrl+&gt;组合键时产生该信号，用户终端向正在运行中的由该终端启动的程序发出些信<br>号。默认动作为终止进程。</li>
+<li>SIGILL：CPU检测到某进程执行了非法指令。默认动作为终止进程并产生core文件</li>
+<li>SIGTRAP：该信号由断点指令或其他 trap指令产生。默认动作为终止里程 并产生core文件。</li>
+<li>SIGABRT: 调用abort函数时产生该信号。默认动作为终止进程并产生core文件。</li>
+<li>SIGBUS：非法访问内存地址，包括内存对齐出错，默认动作为终止进程并产生core文件。</li>
+<li>SIGFPE：在发生致命的运算错误时发出。不仅包括浮点运算错误，还包括溢出及除数为0等所有的算法错误。默认动作为终止进程并产生core文件。</li>
+<li>SIGKILL：无条件终止进程。本信号不能被忽略，处理和阻塞。默认动作为终止进程。它向系统管理员提供了可以杀死任何进程的方法。</li>
+<li>SIGUSE1：用户定义 的信号。即程序员可以在程序中定义并使用该信号。默认动作为终止进程。</li>
+<li>SIGSEGV：指示进程进行了无效内存访问。默认动作为终止进程并产生core文件。</li>
+<li>SIGUSR2：另外一个用户自定义信号，程序员可以在程序中定义并使用该信号。默认动作为终止进程。</li>
+<li>SIGPIPE：Broken pipe向一个没有读端的管道写数据。默认动作为终止进程。</li>
+<li>SIGALRM: 定时器超时，超时的时间 由系统调用alarm设置。默认动作为终止进程。</li>
+<li>SIGTERM：程序结束信号，与SIGKILL不同的是，该信号可以被阻塞和终止。通常用来要示程序正常退出。执行shell命令Kill时，缺省产生这个信号。默认动作为终止进程。</li>
+<li>SIGSTKFLT：Linux早期版本出现的信号，现仍保留向后兼容。默认动作为终止进程。</li>
+<li>SIGCHLD：子进程结束时，父进程会收到这个信号。默认动作为忽略这个信号。</li>
+<li>SIGCONT：如果进程已停止，则使其继续运行。默认动作为继续/忽略。</li>
+<li>SIGSTOP：停止进程的执行。信号不能被忽略，处理和阻塞。默认动作为暂停进程。</li>
+<li>SIGTSTP：停止终端交互进程的运行。按下&lt;ctrl+z&gt;组合键时发出这个信号。默认动作为暂停进程。</li>
+<li>SIGTTIN：后台进程读终端控制台。默认动作为暂停进程。</li>
+<li>SIGTTOU: 该信号类似于SIGTTIN，在后台进程要向终端输出数据时发生。默认动作为暂停进程。</li>
+<li>SIGURG：套接字上有紧急数据时，向当前正在运行的进程发出些信号，报告有紧急数据到达。如网络带外数据到达，默认动作为忽略该信号。</li>
+<li>SIGXCPU：进程执行时间超过了分配给该进程的CPU时间 ，系统产生该信号并发送给该进程。默认动作为终止进程。</li>
+<li>SIGXFSZ：超过文件的最大长度设置。默认动作为终止进程。</li>
+<li>SIGVTALRM：虚拟时钟超时时产生该信号。类似于SIGALRM，但是该信号只计算该进程占用CPU的使用时间。默认动作为终止进程。</li>
+<li>SGIPROF：类似于SIGVTALRM，它不公包括该进程占用CPU时间还包括执行系统调用时间。默认动作为终止进程。</li>
+<li>SIGWINCH：窗口变化大小时发出。默认动作为忽略该信号。</li>
+<li>SIGIO：此信号向进程指示发出了一个异步IO事件。默认动作为忽略。</li>
+<li>SIGPWR：关机。默认动作为终止进程。</li>
+<li>SIGSYS：无效的系统调用。默认动作为终止进程并产生core文件。</li>
+<li>SIGRTMIN ～ (64) SIGRTMAX：LINUX的实时信号，它们没有固定的含义（可以由用户自定义）。所有的实时信号的默认动作都为终止进程。<h4 id="附录："><a href="#附录：" class="headerlink" title="附录："></a>附录：</h4>运行程序的瓶颈在于IO，优化程序的效率优先考虑IO，比如你可以将输出重定向到一个文件，你会发现CPU的效率会很高。<br>time +./a.out 会统计real：程序实际运行的时间，user: 程序运行在用户空间的时间，sys:程序运行在系统的时间。real=user+sys+等待时间。</li>
+</ol>
+<h1 id="告诫："><a href="#告诫：" class="headerlink" title="告诫："></a>告诫：</h1><p>做个好人，没毛病！</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button onclick="document.getElementById('post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div id="post-reward">
+      
+      <div>
+        <img src="/images/wechatpay.png" alt="Fouryearsrain 微信">
+        <p>微信</p>
+      </div>
+      
+      <div>
+        <img src="/images/alipay.png" alt="Fouryearsrain 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AF%BC%E8%88%AA-%E5%88%86%E4%BA%AB/" rel="tag"># 导航 - 分享</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/01/Linux-day3/" rel="prev" title="Linux_day3">
+      <i class="fa fa-chevron-left"></i> Linux_day3
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/01/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%88%EF%BC%88c%E8%AF%AD%E8%A8%80%EF%BC%89/" rel="next" title="数据结构-栈（c语言）">
+      数据结构-栈（c语言） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fouryearsrain</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments('#gitalk-container', () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '98fd58e9ec624bd9144e',
+      clientSecret: 'd48b7e3ae116e32400697b895e0b43d50593865a',
+      repo        : 'myblog_data_comment',
+      owner       : 'Fouryearsrain',
+      admin       : ['Fouryearsrain'],
+      id          : 'fce7836cfa8f1721272ee80b364e3409',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
