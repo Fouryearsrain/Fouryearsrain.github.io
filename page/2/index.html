@@ -280,73 +280,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://fouryearsrain.github.io/2020/08/01/Linux-day2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/timg.jpg">
-      <meta itemprop="name" content="Fouryearsrain">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MyBlog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/01/Linux-day2/" class="post-title-link" itemprop="url">Linux_day2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-01 16:35:11 / 修改时间：16:37:15" itemprop="dateCreated datePublished" datetime="2020-08-01T16:35:11+08:00">2020-08-01</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://fouryearsrain.github.io/2020/08/01/Linux-day1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -409,6 +342,92 @@
 <h2 id="进程共享"><a href="#进程共享" class="headerlink" title="进程共享"></a>进程共享</h2><p>父子进程共享原则：<strong>读时共享写时复制的原则</strong><br>刚fork时的父子进程差别与相同之处：<br>相同：全局变量，.data,.text,堆,栈，环境变量，用户ID，宿主目录，进程工作目录，信号处理方式…<br>不同之处：1，进程ID 2，fork返回值    3，父进程ID    4，运行进程时间    5，闹钟（定时器）    6.未决信号集</p>
 <h2 id="gdb调试"><a href="#gdb调试" class="headerlink" title="gdb调试"></a>gdb调试</h2><p>注意（下面两个函数在fork函数执行前才有效）<br>set follow-fork-mode child 命令设置gdb在fork之后跟踪子进程。<br>set follow-fork-mode parent 设置跟踪父进程。</p>
 <h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>学完一节不总结的话 总感觉少了点什么。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://fouryearsrain.github.io/2020/08/01/Linux-day2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/timg.jpg">
+      <meta itemprop="name" content="Fouryearsrain">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MyBlog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/01/Linux-day2/" class="post-title-link" itemprop="url">Linux_day2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-01 16:34:29" itemprop="dateCreated datePublished" datetime="2020-08-01T16:34:29+08:00">2020-08-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-04 17:23:59" itemprop="dateModified" datetime="2020-08-04T17:23:59+08:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="进程回收"><a href="#进程回收" class="headerlink" title="进程回收"></a>进程回收</h1><h2 id="回收子进程"><a href="#回收子进程" class="headerlink" title="回收子进程"></a>回收子进程</h2><p>所谓回收子进程就是为了回收僵尸进程和子进程，也就是两个函数的使用：<br><strong>wait（）</strong>和 <strong>waitpid()**很明显 waitpid就是在wait的基础上发展出来的函数<br>**wait三个特性：<br>1.阻塞等待子进程退出<br>2.回收子进程残留资源<br>3.获取子进程结束状态（退出原因）。</strong><br>参数列表如下：<br><img src="https://img-blog.csdnimg.cn/20200419141436634.PNG#pic_center" alt="在这里插入图片描述"><br>wait的唯一参数就是传出参数来实现第三个特性。<br>如果想判断wait的具体状态，就需要调用相应的宏来表明具体的进程退出状态<br> <strong>1.  WIFEXITED(status) 为非0    → 进程正常结束<br>    WEXITSTATUS(status) 如上宏为真，使用此宏 → 获取进程退出状态 (exit的参数)<br> 2.     WIFSIGNALED(status) 为非0 → 进程异常终止<br>    WTERMSIG(status) 如上宏为真，使用此宏 → 取得使进程终止的那个信号的编号。</strong><br>    说白了就是两套函数，status就是wait对应的传出参数<br>    而如果查询对应编号的信号，就可以用kill -l 命令查询对应的信号信息。<br><img src="https://img-blog.csdnimg.cn/20200419143025312.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>在此提供第一套函数的用法，第二套函数用法类似。</p>
+<p><strong>waitpid()</strong><br>之所以产生waipid那就肯定是因为wait不够好，<br>1.因为wait的函数只可以对<strong>单个最先死亡的子进程</strong>进行回收。<br>2. waitpid的第一个参数是可以指定单独要回收子进程的id.（比如说 你循环创建n个子进程，然后只想单独回收第n-1个子进程，那么使用wait函数就比较麻烦了，而你使用waitpid就可以单独指向第n-1个进程的id）<br>而且当你指定为-1的时候是对任意的的子进程进行回收（相当于wait）<br>              指定为0的时候回收当前调用waitpid一个组的任意子进程<br>              指定&lt;-1的时候回收指定进程组内的任意子进程 与<strong>kill -9 -进程组号</strong>功能类似<br>3.waitpid可以设定是否阻塞等待，也就是<strong>轮询</strong>，若设定为WNOHANG就是设定为非阻塞状态。<br>这里提供一个轮询的简单架构，回收n个子进程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">do&#123;</span><br><span class="line">pid&#x3D;waitpid(-1,NULL,WNOHANG);</span><br><span class="line">if(pid&gt;0)</span><br><span class="line">&#123;</span><br><span class="line">n--;</span><br><span class="line">&#125;</span><br><span class="line">sleep(1);&#x2F;&#x2F;每一秒查询一次</span><br><span class="line">&#125;while(n&gt;0)</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="execl函数族"><a href="#execl函数族" class="headerlink" title="execl函数族"></a>execl函数族</h3><p>术语：<br>在很多实际应用的场合，我们利用子进程是为了执行一些其他代码或者命令（比如让子进程去执行另一个程序）。所以我们就需要一些函数来帮助我们完成跳出父进程的代码，这也是exec函数族的意义所在。<br>（注意调用exec函数进程ID不会改变，但是会将原子进程的所有内容全部删除，并从新程序的主函数开始执行）<br>有六种(man查询有八种此处不再赘述)以exec开头的函数，统称为exec函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int execl(const char *path, const char *arg, ...);</span><br><span class="line">int execlp(const char *file, const char *arg, ...);</span><br><span class="line">int execle(const char *path, const char *arg, ..., char *const envp[]);</span><br><span class="line">int execv(const char *path, char *const argv[]);</span><br><span class="line">int execvp(const char *file, char *const argv[]);</span><br><span class="line">int execve(const char *path, char *const argv[], char *const envp[]);</span><br></pre></td></tr></table></figure>
+<p>博主这里重点讲述前两种(因为 这六种功能相同只是形式不同而已)</p>
+<p><strong>首先execlp函数：</strong><br>我们首先应该清楚的是：这里的 <strong>l</strong> 和 <strong>p</strong> 是分别指代的 list 和 path(环境变量<a target="_blank" rel="noopener" href="https://editor.csdn.net/md/?articleId=105593413">不清楚的可以点一下</a>)。<br><img src="https://img-blog.csdnimg.cn/20200419110922884.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述">上者是ubuntu查询man page的函数说明，<br>首先注意到execlp函数里面有 <strong>…</strong> 就是说这是一个不定数参数的函数，是因为在不同执行文件中的参数数目也不同，因此为了判定参数的输入终止，需要在函数调用的时候，<strong>最后一个参数设定为NULL.</strong><br>ok<br><strong>第一个参数就是一个可执行文件名</strong>，因为execlp是有一个p的所以，涉及到环境变量，那么执行文件的查找路径也是固定的，所以第一个参数就是一些命令，比如<strong>ls</strong>，那么后面的参数就是对应的参数列表，值得注意的是，函数的第二个参数，一般使用来传可执行文件名，也就是我们主函数中的<strong>arg[0]</strong>,但是我们在第一个参数已经将可执行文件传入，所以，这个参数可以直接传一个空（就是””或者”fasdgadfg”，<strong>但绝对不可以不传</strong>），然后从第二个参数开始传有用的参数，结尾必须使用 NULL这个参数，<br><img src="https://img-blog.csdnimg.cn/20200419112016892.PNG#pic_center" alt="在这里插入图片描述"><br>就是绿色的那种传参方式</p>
+<p><strong>接下来就是execl</strong><br>因为这个不涉及p也就是环境变量，所以就可以用来执行自己设定的文件，就比较方便（但是刚才我用execlp调用相对路径下我自己写的可执行文件也好使，（也就是上图那个紫色的命令）这就很奇怪~，）<br>其实用法与execlp相似，只是第一个参数用来调用自己编写的可执行文件的相对路径或者绝对路径。<br>好了 execl就大概这些内容了，其他函数与此类似，到时候调用manpage查一下就可以了。</p>
+<p>注意：exec函数族只有当执行失败的时候才会回到原来的进程接着执行下一条语句。<br>所以当只有一个进程的程序的时候，就不需要判断exec函数的返回值</p>
+<h3 id="dup2"><a href="#dup2" class="headerlink" title="dup2"></a>dup2</h3><p>dup2可以起到重定向的作用。额~~<br>首先 Linux中文件描述符表我们能够使用的是从表中的第四个开始使用，也就是说前三个是已经被系统占用了。<br>第一个： stdin，输入； 第二个： stdout，输出；第三个： 第三个：stderr，错误。<br>比如 让你将当前终端的所有进程信息输入到一个文件中。你该怎么做呢？？<br>当然如果用 命令行就很简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ps aux &gt; porcess&#x2F;&#x2F;注意这里的process只是一个普通文件名，可以自己人为定义</span><br><span class="line">&#x2F;&#x2F;然后执行</span><br><span class="line">cat process</span><br><span class="line">&#x2F;&#x2F;就可以查看所有的进程号了</span><br></pre></td></tr></table></figure>
+<p>但是其实命令中也是利用了重定向的原理，就是将ps aux命令的输出不输出到屏幕而是打印到文件中。<br>所以 我们也可以利用此原理进行在程序中实现。<br><strong>但注意的是 dup2有两个参数，为了方便记忆，你可以理解为将第二个参数（文件描述符），指向第一个参数（文件描述符）</strong>，下面代码的原理就是将输出文件描述符指向out文件。<br>见一下源码<br><img src="https://img-blog.csdnimg.cn/20200419120256538.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTMyMjc0MA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后 cat一下生成的文件发现达到预期功能。（在此不作演示）</p>
 
       
     </div>
